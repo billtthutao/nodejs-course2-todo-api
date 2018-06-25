@@ -17,14 +17,11 @@ app.post('/todos',(request,response) => {
   });
 });
 
-app.get('/list',(request,response) => {
-  //Todo.find({text:'sent from postman'},(err,doc) =>{
-  Todo.find({},(err,doc) =>{
-    if(err){
-      console.log(err);
-    } else {
-      response.send(JSON.stringify(doc,undefined,2));
-    }
+app.get('/todos',(request,response) => {
+  Todo.find({}).then((todos) => {
+    response.send({todos});
+  }, (err) => {
+    response.status(400).send(err);
   });
 });
 
