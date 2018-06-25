@@ -10,15 +10,16 @@ app.use(bodyParser.json());
 
 app.post('/todos',(request,response) => {
   //console.log(request.body);
-  var todo = new Todo({text:'sent from postman'});
+  var todo = new Todo({text:request.body.text});
   todo.save().then((doc) => {
-  response.send(doc)}, (err) => {
-    response.status(400).send('Unable to save new todo',err);
+  response.send(doc);}, (err) => {
+    response.status(400).send(err);
   });
 });
 
 app.get('/list',(request,response) => {
-  Todo.find({text:'sent from postman'},(err,doc) =>{
+  //Todo.find({text:'sent from postman'},(err,doc) =>{
+  Todo.find({},(err,doc) =>{
     if(err){
       console.log(err);
     } else {
@@ -30,3 +31,5 @@ app.get('/list',(request,response) => {
 app.listen(3000,() => {
   console.log('Server starts up on port 3000');
 });
+
+module.exports= {app};
