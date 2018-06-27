@@ -84,7 +84,7 @@ app.patch('/todos/:id', (request,response) => {
       return response.status(404).send();
     }
 
-    response.send(todo);
+    response.send({todo});
   }).catch((err) => {
     console.log(err);
   });
