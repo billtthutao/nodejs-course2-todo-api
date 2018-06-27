@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var {mongoose} = require('./db/mongoose.js');
 var {Todo} = require('./models/todo.js');
 var {User} = require('./models/user.js');
@@ -59,6 +60,31 @@ app.delete('/todos/:id', (request,response) => {
     }
     
     response.send({todo});
+  }).catch((err) => {
+    console.log(err);
+  });
+});
+
+app.patch('/todos/:id', (request,response) => {
+  var id = request.params.id;
+  var body = _.pick(request.body,['text','completed']);
+
+  if(!ObjectID.isValid(id)){
+    return response.status(404).send();
+  }
+
+  if(_.isBoolean(body.completed) && body.completed){ 
+    body.completedAt = new Date().getTime();
+  }else {
+    body.completedAt = null;
+    body.completed = false;
+  }
+  Todo.findByIdAndUpdate(id,{$set:body},{new:true}).then((todo) => {
+    if(!todo){
+      return response.status(404).send();
+    }
+
+    response.send(todo);
   }).catch((err) => {
     console.log(err);
   });
