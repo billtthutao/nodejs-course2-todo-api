@@ -6,6 +6,7 @@ var {User} = require('./models/user.js');
 var express = require('express');
 var bodyParser = require('body-parser');
 var {ObjectID} = require('mongodb');
+var {authenticate} = require('./middleware/authenticate.js');
 
 var port = process.env.PORT;
 
@@ -103,6 +104,10 @@ app.post('/users',(request,response) => {
   }).catch((err) => {
     response.status(400).send(err);
   });
+});
+
+app.post('/users/me',authenticate,(request,response) => {
+  response.send(request.user);
 });
 
 app.listen(port,() => {
