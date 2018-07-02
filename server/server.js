@@ -106,7 +106,7 @@ app.post('/users',(request,response) => {
   });
 });
 
-app.post('/users/me',authenticate,(request,response) => {
+app.get('/users/me',authenticate,(request,response) => {
   response.send(request.user);
 });
 

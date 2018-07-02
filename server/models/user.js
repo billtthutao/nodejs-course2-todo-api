@@ -55,7 +55,7 @@ UserSchema.methods.toJSON = function () {
   //var userObject = user.toObject();
   var userObject = user;
 
-  return _.pick(userObject,['email','password']);
+  return _.pick(userObject,['_id','email']);
 };
 
 UserSchema.statics.findByToken = function (token) {
@@ -66,11 +66,12 @@ UserSchema.statics.findByToken = function (token) {
   //add error handle
    // return Promise.reject(e);
    return new Promise((resolve,reject) => {
-     reject(e);
+     reject();
+     //reject(e);
    });
   }
 
-  return User.find({'_id':decoded._id,
+  return User.findOne({'_id':decoded._id,
              'tokens.access':'auth',
              'tokens.token':token
   });
