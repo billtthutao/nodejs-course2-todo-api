@@ -7,6 +7,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var {ObjectID} = require('mongodb');
 var {authenticate} = require('./middleware/authenticate.js');
+var bcrypt = require('bcryptjs');
 
 var port = process.env.PORT;
 
@@ -108,6 +109,21 @@ app.post('/users',(request,response) => {
 
 app.get('/users/me',authenticate,(request,response) => {
   response.send(request.user);
+});
+
+app.post('/users/login',(request,response) => {
+  var body = _.pick(request.body,['email','password']);
+  var email = body.email;
+  var password = body.password;
+
+  User.findByCredentials(email,password).then((user) => {
+    user.generateAuthToken().then((token) => {
+      console.log(token);
+      response.header('x-auth',token).send(user.toJSON());
+    })
+  }).catch((err) => {
+    response.status(400).send(err);
+  });
 });
 
 app.listen(port,() => {
