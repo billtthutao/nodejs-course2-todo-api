@@ -6,6 +6,7 @@ const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 const {User} = require('./../models/user');
 const {todos,populateTodos,users,populateUsers} = require('./seed/seed');
+const _ = require('lodash');
 
 beforeEach(populateUsers);
 beforeEach(populateTodos);
@@ -253,5 +254,56 @@ describe('POST /users', () => {
     .send(users[0])
     .expect(400)
     .end(done);
+  });
+});
+
+describe('POST /users/login',() => {
+  it('should login successfully',(done) => {
+    var body = _.pick(users[1],['email','password']);
+    request(app)
+    .post('/users/login')
+    .send(body)
+    .expect(200)
+    .expect((response) => {
+      expect(response.header['x-auth']).toExist();
+    })
+    .end((err,res) => {
+      if(err){
+       return done(err);
+      }
+
+      User.findById(users[1]._id).then((user) => {
+        expect(user.tokens[0]).toInclude({
+          access:'auth',
+          token:res.header['x-auth']
+        });
+        done();
+      }).catch((err) => {
+        done(err);
+      });
+    });
+  });
+
+  it('should login failed',(done) => {
+    request(app)
+    .post('/users/login')
+    .send({email:users[1].email,
+           password:users[1].password+'1'})
+    .expect(400)
+    .expect((response) => {
+      expect(response.header['x-auth']).toNotExist();
+    })
+    .end((err,res) => {
+      if(err){
+        return done(err);
+      }
+      
+      User.findById(users[1]._id).then((user) => {
+        expect(user.tokens.length).toBe(0);
+        done();
+      }).catch((err) => {
+        done(err);
+      });
+    });
   });
 });

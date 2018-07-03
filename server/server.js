@@ -118,7 +118,6 @@ app.post('/users/login',(request,response) => {
 
   User.findByCredentials(email,password).then((user) => {
     user.generateAuthToken().then((token) => {
-      console.log(token);
       response.header('x-auth',token).send(user.toJSON());
     })
   }).catch((err) => {
