@@ -307,3 +307,33 @@ describe('POST /users/login',() => {
     });
   });
 });
+
+describe('DELETE /users/logout/token', () => {
+  it('should logout successfully',(done) => {
+    request(app)
+    .post('/users/logout/token')
+    .set('x-auth',users[0].tokens[0].token)
+    .expect(200)
+    .end((err,res) => {
+      if(err){
+        return done(err);
+      }
+
+      User.findById(users[0]._id).then((user) => {
+        expect(user.tokens).toNotInclude({access:'auth',
+                                          token:users[0].tokens[0].token});
+        done();
+      }).catch((err) => {
+        done(err);
+      });
+    });
+  });
+
+  it('should not logout with invalid token',(done) => {
+    request(app)
+    .post('/users/logout/token')
+    .set('x-auth','xxxxx')
+    .expect(401)
+    .end(done);
+  });
+});
