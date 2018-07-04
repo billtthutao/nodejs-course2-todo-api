@@ -24,14 +24,14 @@ const users = [{
   email: 'bill1@163.com',
   password:'userOnePsw',
   tokens:[{access:'auth',
-           token: jwt.sign({_id:userOneId,access:'auth'},'abc123').toString()
+           token: jwt.sign({_id:userOneId,access:'auth'},process.env.JWT_SECRET).toString()
           }]
   
 },{_id:userTwoId,
    email:'bill2@163.com',
    password:'userTwoPsw',
    tokens:[{access:'auth',
-           token: jwt.sign({_id:userTwoId,access:'auth'},'abc123').toString()
+           token: jwt.sign({_id:userTwoId,access:'auth'},process.env.JWT_SECRET).toString()
           }]
 }];
 
