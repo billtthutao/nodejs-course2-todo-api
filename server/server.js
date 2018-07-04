@@ -32,14 +32,14 @@ app.get('/todos',authenticate,(request,response) => {
   });
 });
 
-app.get('/todos/:id',(request,response) => {
+app.get('/todos/:id',authenticate,(request,response) => {
   var id = request.params.id;
   
   if(!ObjectID.isValid(id)){
     return response.status(404).send();
   }
 
-  Todo.findById(id).then((todo) => {
+  Todo.findOne({_id:id,_creator:request.user._id}).then((todo) => {
     if(!todo){
       return response.status(404).send();
     }
@@ -50,14 +50,14 @@ app.get('/todos/:id',(request,response) => {
   });
 });
 
-app.delete('/todos/:id', (request,response) => {
+app.delete('/todos/:id', authenticate,(request,response) => {
   var id= request.params.id;
 
   if(!ObjectID.isValid(id)){
     return response.status(404).send();
   }
 
-  Todo.findByIdAndDelete(id).then((todo) => {
+  Todo.findOneAndDelete({_id:id,_creator:request.user._id}).then((todo) => {
     if(!todo){
       return response.status(404).send();
     }
@@ -68,7 +68,7 @@ app.delete('/todos/:id', (request,response) => {
   });
 });
 
-app.patch('/todos/:id', (request,response) => {
+app.patch('/todos/:id', authenticate, (request,response) => {
   var id = request.params.id;
   var body = _.pick(request.body,['text','completed']);
 
@@ -82,7 +82,7 @@ app.patch('/todos/:id', (request,response) => {
     body.completedAt = null;
     body.completed = false;
   }
-  Todo.findByIdAndUpdate(id,{$set:body},{new:true}).then((todo) => {
+  Todo.findOneAndUpdate({_id:id,_creator:request.user._id},{$set:body},{new:true}).then((todo) => {
     if(!todo){
       return response.status(404).send();
     }
