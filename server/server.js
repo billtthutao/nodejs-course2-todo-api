@@ -15,17 +15,17 @@ var app = express();
 
 app.use(bodyParser.json());
 
-app.post('/todos',(request,response) => {
+app.post('/todos',authenticate,(request,response) => {
   //console.log(request.body);
-  var todo = new Todo({text:request.body.text});
+  var todo = new Todo({text:request.body.text,_creator:request.user._id});
   todo.save().then((doc) => {
   response.send(doc);}, (err) => {
     response.status(400).send(err);
   });
 });
 
-app.get('/todos',(request,response) => {
-  Todo.find({}).then((todos) => {
+app.get('/todos',authenticate,(request,response) => {
+  Todo.find({_creator:request.user._id}).then((todos) => {
     response.send({todos});
   }, (err) => {
     response.status(400).send(err);
